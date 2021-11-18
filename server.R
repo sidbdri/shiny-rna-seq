@@ -8,6 +8,10 @@ library(ggrepel)
 library(shinycssloaders)
 library(matrixStats)
 library(DT)
+library(conflicted)
+
+conflict_prefer("renderDataTable", "DT")
+conflict_prefer("filter", "dplyr")
 
 shinyServer(function(input, output, session){
   
@@ -17,7 +21,16 @@ shinyServer(function(input, output, session){
   de_data <- reactive({
     req(input$data_select)
     fname <- list.files(str_c('./Data/', input$data_select), pattern = 'fpkm', full.names = T)
-    read.csv(fname)
+    d <- read.csv(fname)
+    cnames <- colnames(d)
+    cnames <- sapply(cnames, function(x){
+      if(str_sub(x, 1, 1) == 'X'){
+        x <- str_sub(x, 2, -1)
+      }
+      return(x)
+    })
+    colnames(d) <- cnames
+    d
   })
   
   de_summary <- reactive({

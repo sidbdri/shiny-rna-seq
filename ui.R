@@ -5,6 +5,8 @@ library(plotly)
 library(readxl)
 library(shinycssloaders)
 library(DT)
+library(conflicted)
+conflict_prefer("dataTableOutput", "DT")
 
 shinyUI(
   fluidPage(
