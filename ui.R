@@ -19,7 +19,7 @@ shinyUI(
       tabsetPanel(type = 'tabs', id = 'resTabs',
                   tabPanel('DEA Results', br(), 
                            fluidRow(
-                             downloadButton('downloadDEResults', 'Download . xlsx')  %>% withSpinner(color="grey"), br(), 
+                             downloadButton('downloadDEResults', 'Download .xlsx')  %>% withSpinner(color="grey"), br(), 
                              dataTableOutput('de_tab') %>% withSpinner(color="grey")
                            )
                           ),
@@ -70,7 +70,8 @@ shinyUI(
                                     plotOutput('go_plot')) %>% withSpinner(color="grey")
                            ),
                            fluidRow(
-                             dataTableOutput(outputId = 'go_table')
+                             downloadButton('downloadGO', 'Download .xlsx') %>% withSpinner(color="grey"), br(),
+                             dataTableOutput(outputId = 'go_table') %>% withSpinner(color="grey")
                            )
                           ),
                   tabPanel('GSA', br(),
@@ -80,6 +81,7 @@ shinyUI(
                                                     'GO' = 'GO',
                                                     'Motif' = 'MOTIF'),
                                         inline = T),
+                           downloadButton('downloadGSA', 'Download .xlsx') %>% withSpinner(color="grey"), br(),
                            dataTableOutput('gsa_table'))
                   )
     )

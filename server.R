@@ -201,6 +201,21 @@ shinyServer(function(input, output, session){
   output$go_table <- renderDataTable(datatable(go_table()[, -7], selection = 'single'),
                                      server = T) # Renders the table without gene list
   
+  output$downloadGO <- downloadHandler(
+    filename = function() {
+      if(input$go_regulation == ''){
+        go.reg <- 'all'
+      }else{
+        go.reg <- c('.up' = 'up', '.down' = 'down')[input$go_regulation]
+      }
+      
+      str_c(input$comp_select, '_', input$go_category, '_', go.reg, '.xlsx')
+    },
+    content = function(file) {
+      WriteXLS::WriteXLS(x = go_table(), ExcelFileName = file, row.names = F, col.names = T, AdjWidth = T, FreezeRow = 1)
+    }
+  )
+  
   go_plot <- reactive({
     go_genes <- go_table()[input$go_table_rows_selected, 7]
     go_genes <- str_split(go_genes, ', ') %>% unlist
@@ -244,6 +259,15 @@ shinyServer(function(input, output, session){
   })
   
   output$gsa_table <- renderDataTable(gsa_table())
+  
+  output$downloadGSA <- downloadHandler(
+    filename = function() {
+      str_c(input$comp_select, '_', input$gsa_cat, '.xlsx')
+    },
+    content = function(file) {
+      WriteXLS::WriteXLS(x = gsa_table(), ExcelFileName = file, row.names = F, col.names = T, AdjWidth = T, FreezeRow = 1)
+    }
+  )
   
 })
 
