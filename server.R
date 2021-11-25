@@ -12,6 +12,7 @@ library(conflicted)
 
 conflict_prefer("renderDataTable", "DT")
 conflict_prefer("filter", "dplyr")
+conflict_prefer("arrange", "dplyr")
 
 shinyServer(function(input, output, session){
   
@@ -57,9 +58,18 @@ shinyServer(function(input, output, session){
   })
   rtd <- reactive({
     req(de_tab_data())
-    de_tab_data() %>% na.omit
+    de_tab_data() %>% na.omit %>% arrange(`P-adj`)
   })
   output$de_tab <- renderDataTable(rtd())
+  
+  output$downloadDEResults <- downloadHandler(
+    filename = function() {
+      str_c(input$comp_select, '_DE_results.xlsx')
+    },
+    content = function(file) {
+      WriteXLS::WriteXLS(x = rtd(), ExcelFileName = file, row.names = F, col.names = T, AdjWidth = T, FreezeRow = 1)
+    }
+  )
   
   #MA plot
   ma_plot <- reactive({

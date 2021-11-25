@@ -19,6 +19,7 @@ shinyUI(
       tabsetPanel(type = 'tabs', id = 'resTabs',
                   tabPanel('DEA Results', br(), 
                            fluidRow(
+                             downloadButton('downloadDEResults', 'Download . xlsx')  %>% withSpinner(color="grey"), br(), 
                              dataTableOutput('de_tab') %>% withSpinner(color="grey")
                            )
                           ),
