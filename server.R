@@ -217,7 +217,7 @@ shinyServer(function(input, output, session){
   )
   
   go_plot <- reactive({
-    go_genes <- go_table()[input$go_table_rows_selected, 7]
+    go_genes <- go_table()[input$go_table_rows_selected, 8]
     go_genes <- str_split(go_genes, ', ') %>% unlist
     #req(input$exp_genes)
     #dtb <- de_tab_data() %>% na.omit
