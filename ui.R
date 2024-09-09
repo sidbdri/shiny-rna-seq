@@ -10,7 +10,15 @@ conflict_prefer("dataTableOutput", "DT")
 
 shinyUI(
   fluidPage(
-    fluidRow(
+    tags$style(HTML("
+      #first {
+          border: 16px double white;
+      }
+      #second {
+          border: 2px dashed blue;
+      }
+    ")),
+    fluidRow(id = 'first',
       uiOutput('data_select_ui'),
       uiOutput('comp_select_ui'),
       height = '150%'
@@ -18,7 +26,7 @@ shinyUI(
     fillRow(
       tabsetPanel(type = 'tabs', id = 'resTabs',
                   tabPanel('DEA Results', br(), 
-                           fluidRow(
+                           fluidRow(id = 'first',
                              downloadButton('downloadDEResults', 'Download .xlsx')  %>% withSpinner(color="grey"), br(), 
                              dataTableOutput('de_tab') %>% withSpinner(color="grey")
                            )
@@ -57,7 +65,7 @@ shinyUI(
                              )
                            )),
                   tabPanel('GO', br(),
-                           fluidRow(
+                           fluidRow(id = 'first',
                              column(width = 4,
                                radioButtons(inputId = 'go_category', label = 'GO Category:',
                                             choices = c('BP' = 'bp', 'CC' = 'cc', 'MF' = 'mf'),
@@ -69,7 +77,7 @@ shinyUI(
                              column(width = 6,
                                     plotOutput('go_plot')) %>% withSpinner(color="grey")
                            ),
-                           fluidRow(
+                           fluidRow(id = 'first',
                              downloadButton('downloadGO', 'Download .xlsx') %>% withSpinner(color="grey"), br(),
                              dataTableOutput(outputId = 'go_table') %>% withSpinner(color="grey")
                            )
