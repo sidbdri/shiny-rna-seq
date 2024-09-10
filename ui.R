@@ -34,8 +34,15 @@ shinyUI(
                   tabPanel('Plots',
                            tabsetPanel(type = 'tabs', id = 'plotTabs',
                                        tabPanel('MA plot', br(),
-                                                textInput(inputId = 'ma_cutoff', label = 'P-value cutoff:', value = 0.05),
-                                                plotOutput('ma_plot') %>% withSpinner(color="grey")),
+                                                fluidRow(
+                                                  column(width = 3, textInput(inputId = 'ma_cutoff', label = 'P-value cutoff:', value = 0.05)),
+                                                  column(width = 6, sliderInput(inputId = 'ma_limits', label = 'Log-fold change limits:',
+                                                                     value = c(-1, 1), min = -3, max = 3, step = 0.1))
+                                                ),
+                                                fluidRow(
+                                                  plotOutput('ma_plot') %>% withSpinner(color="grey")
+                                                  )
+                                                ),
                                        tabPanel('Volcano plot', br(),
                                                 textInput(inputId = 'vulcano_cutoff', label = 'P-value cutoff:', value = 0.05),
                                                 plotOutput('vplot') %>% withSpinner(color="grey")

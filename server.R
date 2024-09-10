@@ -73,7 +73,7 @@ shinyServer(function(input, output, session){
   
   #MA plot
   ma_plot <- reactive({
-    req(input$ma_cutoff)
+    req(input$ma_cutoff, input$ma_limits)
     samples <- c(
       de_summary() %>% filter(Comparison == input$comp_select) %>% pull(Sample_names_in_base_level_condition) %>% str_split(',') %>% unlist %>% str_c('_fpkm'),
       de_summary() %>% filter(Comparison == input$comp_select) %>% pull(Sample_names_in_comparison_level_condition) %>% str_split(',') %>% unlist %>% str_c('_fpkm')
@@ -84,7 +84,7 @@ shinyServer(function(input, output, session){
     ma_cutoff <- input$ma_cutoff %>% as.numeric
     ma_data <- ma_data %>% na.omit
     plot_ma_data <- data.frame(`M` = ma_data$avg_fpkm, `A` = ma_data$Log2FC, `isde` = ma_data$`P-adj` <= ma_cutoff)
-    geneplotter::plotMA(plot_ma_data)
+    geneplotter::plotMA(plot_ma_data, ylim = c(input$ma_limits[1], input$ma_limits[2]))
   })
   output$ma_plot <- renderPlot(ma_plot())
                                 
