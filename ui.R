@@ -44,9 +44,15 @@ shinyUI(
                                                   )
                                                 ),
                                        tabPanel('Volcano plot', br(),
-                                                textInput(inputId = 'vulcano_cutoff', label = 'P-value cutoff:', value = 0.05),
-                                                plotOutput('vplot') %>% withSpinner(color="grey")
+                                                fluidRow(
+                                                  column(width = 2, textInput(inputId = 'vulcano_cutoff', label = 'P-value cutoff:', value = 0.05)),
+                                                  column(width = 4, uiOutput(outputId = 'vplot_xlim')),
+                                                  column(width = 2, uiOutput(outputId = 'vplot_ylim'))
                                                 ),
+                                                fluidRow(
+                                                  plotOutput('vplot') %>% withSpinner(color="grey")
+                                                )
+                                              ),
                                        tabPanel('Expression plot', br(),
                                                 sidebarLayout(
                                                   sidebarPanel(

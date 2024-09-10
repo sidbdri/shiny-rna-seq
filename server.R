@@ -89,19 +89,39 @@ shinyServer(function(input, output, session){
   output$ma_plot <- renderPlot(ma_plot())
                                 
   #Volcano plot
-  vplot <- reactive({
+  vplot_xlim <- reactive({
     req(input$vulcano_cutoff)
+    sliderInput(inputId = 'vulcano_xlim', label = 'Log-fold change limits:', step = 0.5,
+                value = c(min(rtd()$Log2FC) %>% floor, max(rtd()$Log2FC) %>% ceiling), min = -8, max = 8)
+                #value = c(min(de_tab_data()$Log2FC), max(de_tab_data()$Log2FC)),
+                #min = 1.1*min(de_tab_data()$Log2FC), max = 1.1*max(de_tab_data()$Log2FC))
+  })
+  output$vplot_xlim <- renderUI({vplot_xlim()})
+  
+  vplot_ylim <- reactive({
+    max_value <- rtd() %>% filter(`P-adj` > 0) %>% pull(`P-adj`) %>% min
+    max_value <- -log10(max_value)/100
+    max_value <- 100*ceiling(max_value)
+    #max_value <- 100*ceiling(max(-log10(de_tab_data() %>% filter(`P-ajd` > 0) %>% pull(`P-adj`)))/100)
+    textInput(inputId = 'vulcano_ylim', value = max_value, label = 'y-limit:')
+  })
+  output$vplot_ylim <- renderUI({vplot_ylim()})
+  
+  vplot <- reactive({
+    req(input$vulcano_cutoff, input$vulcano_xlim, input$vulcano_ylim)
     p_cutoff <- as.numeric(input$vulcano_cutoff)
     vplot_reg <- rep('Not sig.', nrow(de_tab_data()))
     vplot_reg[de_tab_data()$Log2FC > 0 & de_tab_data()$`P-adj` <= p_cutoff] <- 'Up reg.'
     vplot_reg[de_tab_data()$Log2FC < 0 & de_tab_data()$`P-adj` <= p_cutoff] <- 'Down reg.'
     vdata <- de_tab_data()
     vdata$regulation <- vplot_reg
-    ggplot(vdata, aes(x = Log2FC, y = -log10(`P-adj`), color = regulation)) + 
+    p <- ggplot(vdata, aes(x = Log2FC, y = -log10(`P-adj`), color = regulation)) + 
       scale_color_manual(values = c('Not sig.' = 'gray', 'Up reg.' = 'darkred', 'Down reg.' = 'navy')) +
-      geom_point() + theme_bw()
+      geom_point() + theme_bw() + ylim(0, 1.5*max(-log10(vdata$`P-adj`))) +
+      xlim(input$vulcano_xlim[1], input$vulcano_xlim[2]) + ylim(0, (input$vulcano_ylim %>% as.numeric))
+    list(plot = p)
   })
-  output$vplot <- renderPlot(vplot())
+  output$vplot <- renderPlot(vplot()$plot)
   
   #Expression plot
   genelist <- reactive({
