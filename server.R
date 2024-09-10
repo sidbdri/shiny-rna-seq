@@ -99,7 +99,7 @@ shinyServer(function(input, output, session){
     vdata$regulation <- vplot_reg
     ggplot(vdata, aes(x = Log2FC, y = -log10(`P-adj`), color = regulation)) + 
       scale_color_manual(values = c('Not sig.' = 'gray', 'Up reg.' = 'darkred', 'Down reg.' = 'navy')) +
-      geom_point()
+      geom_point() + theme_bw()
   })
   output$vplot <- renderPlot(vplot())
   
