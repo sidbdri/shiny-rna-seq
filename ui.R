@@ -50,7 +50,7 @@ shinyUI(
                                                   column(width = 2, uiOutput(outputId = 'vplot_ylim'))
                                                 ),
                                                 fluidRow(
-                                                  plotOutput('vplot') %>% withSpinner(color="grey")
+                                                  plotlyOutput('vplot') %>% withSpinner(color="grey")
                                                 )
                                               ),
                                        tabPanel('Expression plot', br(),
@@ -60,7 +60,8 @@ shinyUI(
                                                     uiOutput('exp_gene_selector') %>% withSpinner(color="grey")
                                                   ),
                                                   mainPanel(
-                                                    plotOutput('expplot') %>% withSpinner(color="grey")
+                                                    plotOutput('expplot') %>% withSpinner(color="grey"),
+                                                    plotlyOutput('expplotly') %>% withSpinner(color="grey")
                                                   )
                                                 )
                                                 

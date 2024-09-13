@@ -115,13 +115,13 @@ shinyServer(function(input, output, session){
     vplot_reg[de_tab_data()$Log2FC < 0 & de_tab_data()$`P-adj` <= p_cutoff] <- 'Down reg.'
     vdata <- de_tab_data()
     vdata$regulation <- vplot_reg
-    p <- ggplot(vdata, aes(x = Log2FC, y = -log10(`P-adj`), color = regulation)) + 
+    p <- ggplot(vdata, aes(x = Log2FC, y = -log10(`P-adj`), color = regulation, Gene = `Gene name`)) + 
       scale_color_manual(values = c('Not sig.' = 'gray', 'Up reg.' = 'darkred', 'Down reg.' = 'navy')) +
       geom_point() + theme_bw() + ylim(0, 1.5*max(-log10(vdata$`P-adj`))) +
       xlim(input$vulcano_xlim[1], input$vulcano_xlim[2]) + ylim(0, (input$vulcano_ylim %>% as.numeric))
-    list(plot = p)
+    ggplotly(p)
   })
-  output$vplot <- renderPlot(vplot()$plot)
+  output$vplot <- renderPlotly(vplot())
   
   #Expression plot
   genelist <- reactive({
@@ -156,14 +156,16 @@ shinyServer(function(input, output, session){
     #exp_data$Gene[!(exp_data$Gene %in% input$exp_genes)]
     #exp_data <- exp_data[!(is.na(exp_data$signif)), ]
     
-    ggplot(exp_data, aes(x = base_avgs, y = comp_avgs, colour = signif)) + geom_point() +
+    p <- ggplot(exp_data, aes(x = base_avgs, y = comp_avgs, colour = signif, Gene = `Gene`)) + geom_point() +
       scale_color_manual(values = c('TRUE' = 'darkred', 'FALSE' = 'gray')) + theme_bw() + 
       xlab(base_cond) + ylab(comp_cond) + scale_x_log10() + scale_y_log10() + 
       theme(legend.position = "none", text = element_text(size = 16)) + geom_label_repel(data = label_data, aes(x = base_avgs, y = comp_avgs, label = Gene))+
       geom_point(data = label_data, aes(x = base_avgs, y = comp_avgs, fill = signif), colour = 'black', shape = 21)
-    
+    p
   })
+  output$expplotly <- renderPlotly(ggplotly(expplot()))
   output$expplot <- renderPlot(expplot())
+  
   
   ### PCA plot
   clust_samples <- reactive({
