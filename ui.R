@@ -97,12 +97,7 @@ shinyUI(
                            )
                           ),
                   tabPanel('GSA', br(),
-                           radioButtons(inputId = 'gsa_cat', label = 'Category:',
-                                        choices = c('Cell type' = 'CELL_TYPE',
-                                                    'Curated' = 'CURATED',
-                                                    'GO' = 'GO',
-                                                    'Motif' = 'MOTIF'),
-                                        inline = T),
+                           uiOutput('gsa_cat'),
                            downloadButton('downloadGSA', 'Download .xlsx') %>% withSpinner(color="grey"), br(),
                            dataTableOutput('gsa_table'))
                   )

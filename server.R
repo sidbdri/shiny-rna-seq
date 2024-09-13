@@ -41,6 +41,7 @@ shinyServer(function(input, output, session){
   })
   
   comps <- reactive({
+    req(input$data_select)
     comps <- de_summary()$Comparison
     comps
   })
@@ -271,8 +272,15 @@ shinyServer(function(input, output, session){
   output$go_plot <- renderPlot(go_plot())
   
   # GSA
+  output$gsa_cat <- renderUI({
+    req(input$data_select, input$comp_select)
+    species <- list.dirs(str_c('Data/', input$data_select, '/gene_set_tests'), recursive = F, full.names = F)
+    cats <- list.dirs(str_c('Data/', input$data_select, '/gene_set_tests/', species, '/', input$comp_select, '/'), recursive = F, full.names = F)
+    radioButtons(inputId = 'gsa_cat', label = 'Category:', choices = cats, inline = T)
+  })
   
   gsa_table <- reactive({
+    req(input$gsa_cat, input$data_select, input$comp_select)
     species <- list.dirs(str_c('Data/', input$data_select, '/gene_set_tests'), recursive = F, full.names = F)
     gsa_file <- str_c('Data/', input$data_select, '/gene_set_tests/', species, '/', input$comp_select, '/',
                       input$comp_select, '-', input$gsa_cat, '_sets.csv')
