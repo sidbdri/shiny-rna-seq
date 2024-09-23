@@ -39,7 +39,7 @@ shinyUI(
                                                   column(width = 6, sliderInput(inputId = 'ma_limits', label = 'Log-fold change limits:',
                                                                      value = c(-1, 1), min = -3, max = 3, step = 0.1))
                                                 ),
-                                                fluidRow(
+                                                fluidRow(id = 'first',
                                                   plotOutput('ma_plot') %>% withSpinner(color="grey")
                                                   )
                                                 ),
@@ -49,7 +49,7 @@ shinyUI(
                                                   column(width = 4, uiOutput(outputId = 'vplot_xlim')),
                                                   column(width = 2, uiOutput(outputId = 'vplot_ylim'))
                                                 ),
-                                                fluidRow(
+                                                fluidRow(id = 'first',
                                                   plotlyOutput('vplot') %>% withSpinner(color="grey")
                                                 )
                                               ),
