@@ -239,10 +239,10 @@ shinyServer(function(input, output, session){
       cond_samples <- str_c(cond_samples, '_fpkm')
     }
     cdtab <- cdtab[, c(base_samples, cond_samples)] %>% melt()
-    cdtab[, 'Condition'] <- base_cond
-    cdtab[cdtab$variable%in%cond_samples, 'Condition'] <- cond_cond
-    cdtab$Condition <- factor(cdtab$Condition, levels = c(base_cond, cond_cond))
-    p <- ggplot(cdtab, aes(x = Condition, y = value)) + theme_bw()
+    cdtab[, comp_cond] <- base_cond
+    cdtab[cdtab$variable%in%cond_samples, comp_cond] <- cond_cond
+    cdtab[, comp_cond] <- factor(cdtab[, comp_cond], levels = c(base_cond, cond_cond))
+    p <- ggplot(cdtab, aes_string(x = comp_cond, y = 'value', Sample = 'variable')) + theme_bw()
     if(input$gene_plot_type == 'box'){
       p <- p + geom_boxplot() + geom_point()
     }else{
