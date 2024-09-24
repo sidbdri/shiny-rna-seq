@@ -65,7 +65,18 @@ shinyUI(
                                                   )
                                                 )
                                                 
-                                              )
+                                              ),
+                                       tabPanel('Gene plot', br(),
+                                                fluidRow(id = 'first',
+                                                  column(width = 4, uiOutput(outputId = 'gene_plot_selector')),
+                                                  column(width = 2, radioButtons(inputId = 'gene_plot_value', label = 'Select value:', choices = c('Counts' = 'counts', 'FPKM' = 'fpkm'))),
+                                                  column(width = 2, radioButtons(inputId = 'gene_plot_type', label = 'Select plot type:', choices = c('Box plot' = 'box', 'Violin plot' = 'violin')))
+                                                ),
+                                                fluidRow(id = 'first',
+                                                         #tableOutput(outputId = 'gene_plot')
+                                                         plotlyOutput(outputId = 'gene_plot')
+                                                )
+                                       )
                                        )
                            ),
                   tabPanel('Sample PCA', br(),

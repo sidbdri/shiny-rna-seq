@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(matrixStats)
 library(DT)
 library(conflicted)
+library(reshape2)
 
 conflict_prefer("renderDataTable", "DT")
 conflict_prefer("filter", "dplyr")
@@ -22,6 +23,21 @@ shinyServer(function(input, output, session){
   de_data <- reactive({
     req(input$data_select)
     fname <- list.files(str_c('./Data/', input$data_select), pattern = 'fpkm', full.names = T)
+    d <- read.csv(fname)
+    cnames <- colnames(d)
+    cnames <- sapply(cnames, function(x){
+      if(str_sub(x, 1, 1) == 'X'){
+        x <- str_sub(x, 2, -1)
+      }
+      return(x)
+    })
+    colnames(d) <- cnames
+    d
+  })
+  
+  de_data_counts <- reactive({
+    req(input$data_select)
+    fname <- list.files(str_c('./Data/', input$data_select), pattern = 'count', full.names = T)
     d <- read.csv(fname)
     cnames <- colnames(d)
     cnames <- sapply(cnames, function(x){
@@ -202,6 +218,40 @@ shinyServer(function(input, output, session){
   })
   
   output$pca_plot <- renderPlot(clust_plot())
+  
+  #Gene expression plots
+  output$gene_plot_selector <- renderUI(
+    selectizeInput(inputId = 'gene_plot_select', 'Select gene:', genelist(), selected = NULL, multiple = FALSE, options = NULL)
+  )
+  gene_plot <- reactive({
+    req(input$gene_plot_type, input$gene_plot_value, input$gene_plot_select)
+    df <- de_summary() %>% filter(Comparison == input$comp_select)
+    base_samples <- df %>% select_at(c(7)) %>% as.character() %>% str_split(',') %>% unlist
+    cond_samples <- df %>% select_at(c(10)) %>% as.character() %>% str_split(',') %>% unlist
+    comp_cond <- df %>% pull(3) %>% as.character()
+    base_cond <- df %>% pull(5)
+    cond_cond <- df %>% pull(8)
+    if(input$gene_plot_value == 'counts'){
+      cdtab <- de_data_counts() %>% filter(`gene_name` == input$gene_plot_select)
+    }else{
+      cdtab <- de_data() %>% filter(`gene_name` == input$gene_plot_select)
+      base_samples <- str_c(base_samples, '_fpkm')
+      cond_samples <- str_c(cond_samples, '_fpkm')
+    }
+    cdtab <- cdtab[, c(base_samples, cond_samples)] %>% melt()
+    cdtab[, 'Condition'] <- base_cond
+    cdtab[cdtab$variable%in%cond_samples, 'Condition'] <- cond_cond
+    cdtab$Condition <- factor(cdtab$Condition, levels = c(base_cond, cond_cond))
+    p <- ggplot(cdtab, aes(x = Condition, y = value)) + theme_bw()
+    if(input$gene_plot_type == 'box'){
+      p <- p + geom_boxplot() + geom_point()
+    }else{
+      p <- p + geom_violin() + geom_point()
+    }
+    p
+  })
+  output$gene_plot <- renderPlotly(gene_plot() %>% ggplotly)
+  #output$gene_plot <- renderTable(gene_plot())
   
   #GO
   
