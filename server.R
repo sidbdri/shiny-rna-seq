@@ -233,22 +233,25 @@ shinyServer(function(input, output, session){
     cond_cond <- df %>% pull(8)
     if(input$gene_plot_value == 'counts'){
       cdtab <- de_data_counts() %>% filter(`gene_name` == input$gene_plot_select)
+      ylabel <- 'Read counts'
     }else{
       cdtab <- de_data() %>% filter(`gene_name` == input$gene_plot_select)
       base_samples <- str_c(base_samples, '_fpkm')
       cond_samples <- str_c(cond_samples, '_fpkm')
+      ylabel <- 'FPKM'
     }
     cdtab <- cdtab[, c(base_samples, cond_samples)] %>% melt()
     cdtab[, comp_cond] <- base_cond
     cdtab[cdtab$variable%in%cond_samples, comp_cond] <- cond_cond
     cdtab[, comp_cond] <- factor(cdtab[, comp_cond], levels = c(base_cond, cond_cond))
-    p <- ggplot(cdtab, aes_string(x = comp_cond, y = 'value', Sample = 'variable')) + theme_bw()
+    colnames(cdtab)[1] <- 'sample'
+    p <- ggplot(cdtab, aes_string(x = comp_cond, y = 'value')) + theme_bw()
     if(input$gene_plot_type == 'box'){
-      p <- p + geom_boxplot() + geom_point()
+      p <- p + geom_boxplot() + geom_point(aes_string(x = comp_cond, y = 'value', sample = 'sample'))
     }else{
-      p <- p + geom_violin() + geom_point()
+      p <- p + geom_violin() + geom_point(aes_string(x = comp_cond, y = 'value', sample = 'sample'))
     }
-    p
+    p + ylab(ylabel) + ggtitle(input$gene_plot_select)
   })
   output$gene_plot <- renderPlotly(gene_plot() %>% ggplotly)
   #output$gene_plot <- renderTable(gene_plot())
