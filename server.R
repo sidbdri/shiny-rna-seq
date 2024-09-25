@@ -181,7 +181,7 @@ shinyServer(function(input, output, session){
     p
   })
   output$expplotly <- renderPlotly(ggplotly(expplot()))
-  output$expplot <- renderPlot(expplot())
+  #output$expplot <- renderPlot(expplot())
   
   
   ### PCA plot
@@ -247,14 +247,14 @@ shinyServer(function(input, output, session){
     colnames(cdtab)[1] <- 'sample'
     p <- ggplot(cdtab, aes_string(x = comp_cond, y = 'value')) + theme_bw()
     if(input$gene_plot_type == 'box'){
-      p <- p + geom_boxplot() + geom_point(aes_string(x = comp_cond, y = 'value', sample = 'sample'))
-    }else{
-      p <- p + geom_violin() + geom_point(aes_string(x = comp_cond, y = 'value', sample = 'sample'))
+      p <- p + geom_boxplot()
+    }else if(input$gene_plot_type == 'violin'){
+      p <- p + geom_violin()
     }
-    p + ylab(ylabel) + ggtitle(input$gene_plot_select)
+    p + geom_point(aes_string(x = comp_cond, y = 'value', sample = 'sample')) + ylab(ylabel) + ggtitle(input$gene_plot_select)
   })
   output$gene_plot <- renderPlotly(gene_plot() %>% ggplotly)
-  #output$gene_plot <- renderTable(gene_plot())
+
   
   #GO
   
