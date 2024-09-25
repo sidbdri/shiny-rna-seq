@@ -73,8 +73,10 @@ shinyUI(
                                                   column(width = 2, radioButtons(inputId = 'gene_plot_type', label = 'Select plot type:', choices = c('Scatter plot' = 'scatter', 'Box plot' = 'box', 'Violin plot' = 'violin')))
                                                 ),
                                                 fluidRow(id = 'first',
-                                                         #tableOutput(outputId = 'gene_plot')
-                                                         plotlyOutput(outputId = 'gene_plot')
+                                                  column(width = 12,
+                                                         plotlyOutput(outputId = 'gene_plot', width = '60%')
+                                                        )
+                                                         
                                                 )
                                        )
                                        )
